@@ -63,3 +63,8 @@ jobs:
           cd tests/generation
           bash ./run_gen_qwen05.sh 4 $HOME/data/gen/qwen_05_gen_test.parquet
           rm -rf $HOME/data/gen/qwen_05_gen_test.parquet
+      - name: Run Qwen 0.5B generation test when world_size == 1
+        run: |
+          cd tests/generation
+          bash ./run_gen_qwen05.sh 1 $HOME/data/gen/qwen_05_gen_test.parquet
+          rm -rf $HOME/data/gen/qwen_05_gen_test.parquet

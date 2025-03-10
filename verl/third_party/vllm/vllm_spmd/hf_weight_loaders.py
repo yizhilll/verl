@@ -36,13 +36,13 @@ def load_hf_weights(actor_weights: Dict, vllm_model: nn.Module):
             quant_method.process_weights_after_loading(module)
         # FIXME: Remove this after Mixtral is updated
         # to use quant_method.
-        
+
         # Handle process_weights_after_loading method for each layer
         if hasattr(module, "process_weights_after_loading"):
             # Use inspect to check method signature
             import inspect
             signature = inspect.signature(module.process_weights_after_loading)
-            
+
             # Call differently based on signature
             if 'act_dtype' in signature.parameters:
                 # act_dtype parameter is required
@@ -55,7 +55,7 @@ def load_hf_weights(actor_weights: Dict, vllm_model: nn.Module):
                     except (StopIteration, RuntimeError):
                         # If module has no parameters, use model's dtype
                         act_dtype = next(vllm_model.parameters()).dtype
-                
+
                 module.process_weights_after_loading(act_dtype)
             else:
                 # No act_dtype parameter needed
