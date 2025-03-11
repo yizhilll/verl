@@ -81,9 +81,8 @@ class FSDPVLLMShardingManager(BaseShardingManager):
         else:
             self.inference_engine.wake_up()
             if load_format == 'dtensor':
-                from verl.third_party.vllm import load_dtensor_weights
-                load_dtensor_weights(
-                    params, self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner.model)
+                model = self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner.model
+                model.load_weights(((name, param.full_tensor()) for name, param in params.items()))
             elif load_format == 'hf':
                 from verl.third_party.vllm import load_hf_weights
                 load_hf_weights(params,
