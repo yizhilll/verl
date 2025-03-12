@@ -19,7 +19,6 @@ import numpy as np
 from torch.distributed.fsdp.fully_sharded_data_parallel import FullyShardedDataParallel as FSDP
 from torch.distributed.fsdp.api import ShardingStrategy, ShardedStateDictConfig, StateDictType, FullStateDictConfig
 from torch.distributed.device_mesh import DeviceMesh
-from torch.distributed.tensor import DTensor
 
 from verl.third_party.vllm import LLM
 from verl.third_party.vllm import parallel_state as vllm_ps
@@ -81,9 +80,10 @@ class FSDPVLLMShardingManager(BaseShardingManager):
             self.inference_engine.sync_model_weights(params, load_format=load_format)
         else:
             self.inference_engine.wake_up()
+            world_size = torch.distributed.get_world_size()
             model = self.inference_engine.llm_engine.model_executor.driver_worker.worker.model_runner.model
-            loaded_params = model.load_weights((
-                (name, param.full_tensor() if isinstance(param, DTensor) else param) for name, param in params.items()))
+            loaded_params = model.load_weights(
+                ((name, param.full_tensor() if world_size != 1 else param) for name, param in params.items()))
             logger.info(f"vLLM load wegiths, loaded_params: {len(loaded_params)}")
 
         log_gpu_memory_usage('After sync model weights in sharding manager', logger=logger)
