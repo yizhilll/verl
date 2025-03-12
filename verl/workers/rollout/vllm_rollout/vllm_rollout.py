@@ -185,7 +185,7 @@ class vLLMRollout(BaseRollout):
                 'temperature': 0,
                 'n': 1  # if greedy, only 1 response
             }
-        elif is_validate and do_sample:
+        elif is_validate:
             # TODO: try **
             kwargs = {
                 'top_k': self.config.val_kwargs.top_k,
